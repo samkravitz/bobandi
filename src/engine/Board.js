@@ -54,6 +54,23 @@ class Board {
         return this.board[square.rank][square.file] !== 0
     }
 
+    parseUciMove(move) {
+        const oldFile = move.charCodeAt(0) - 'a'.charCodeAt()
+        const oldRank = move.charAt(1) - 1
+        const newFile = move.charCodeAt(2) - 'a'.charCodeAt()
+        const newRank = move.charAt(3) - 1
+
+        this.board[newRank][newFile] = this.board[oldRank][oldFile]
+        this.board[newRank][newFile].square = { rank: newRank, file: newFile }
+        this.board[oldRank][oldFile] = 0
+    }
+
+    parseUciMoves(moves) {
+        if (moves === '')
+            return
+        moves.split(' ').forEach(move => this.parseUciMove(move))
+    }
+
     toString() {
         let res = ''
         for (let rank = 7; rank >= 0; rank--) {
