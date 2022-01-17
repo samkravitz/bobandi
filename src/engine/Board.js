@@ -1,4 +1,5 @@
 const { Bishop, King, Knight, Pawn, Queen, Rook, Color } = require('./piece')
+const { uciStringFromMove } = require ('./util')
 
 class Board {
     constructor() {
@@ -69,6 +70,29 @@ class Board {
         if (moves === '')
             return
         moves.split(' ').forEach(move => this.parseUciMove(move))
+    }
+
+    getLegalMoves() {
+        const black = []
+        const white = []
+
+        for (let rank = 0; rank < 8; rank++) {
+            for (let file = 0; file < 8; file++) {
+                if (!this.pieceOnSquare({ rank, file }))
+                    continue
+                
+                const piece = this.board[rank][file]
+                if (piece.isWhite())
+                    white.push(...piece.getLegalMoves(this))
+                else
+                    black.push(...piece.getLegalMoves(this))
+            }
+        }
+        
+        return {
+            black: black.map(move => uciStringFromMove(move.oldSquare, move.newSquare)),
+            white: white.map(move => uciStringFromMove(move.oldSquare, move.newSquare)),
+        }
     }
 
     toString() {
