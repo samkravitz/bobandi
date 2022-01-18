@@ -3,51 +3,94 @@ const { uciStringFromMove } = require ('./util')
 
 class Board {
     constructor() {
+        const whiteRook1 =   new Rook(Color.white,   { rank: 0, file: 0 })
+        const whiteRook2 =   new Rook(Color.white,   { rank: 0, file: 7 })
+        const whiteKnight1 = new Knight(Color.white, { rank: 0, file: 1 })
+        const whiteKnight2 = new Knight(Color.white, { rank: 0, file: 6 })
+        const whiteBishop1 = new Bishop(Color.white, { rank: 0, file: 2 })
+        const whiteBishop2 = new Bishop(Color.white, { rank: 0, file: 5 })
+        const whiteQueen =   new Queen(Color.white,  { rank: 0, file: 3 })
+        const whiteKing =    new King(Color.white,   { rank: 0, file: 4 })
+        const whitePawn1 =   new Pawn(Color.white,   { rank: 1, file: 0 })
+        const whitePawn2 =   new Pawn(Color.white,   { rank: 1, file: 1 })
+        const whitePawn3 =   new Pawn(Color.white,   { rank: 1, file: 2 })
+        const whitePawn4 =   new Pawn(Color.white,   { rank: 1, file: 3 })
+        const whitePawn5 =   new Pawn(Color.white,   { rank: 1, file: 4 })
+        const whitePawn6 =   new Pawn(Color.white,   { rank: 1, file: 5 })
+        const whitePawn7 =   new Pawn(Color.white,   { rank: 1, file: 6 })
+        const whitePawn8 =   new Pawn(Color.white,   { rank: 1, file: 7 })
+
+        const blackRook1 =   new Rook(Color.black,   { rank: 7, file: 0 })
+        const blackRook2 =   new Rook(Color.black,   { rank: 7, file: 7 })
+        const blackKnight1 = new Knight(Color.black, { rank: 7, file: 1 })
+        const blackKnight2 = new Knight(Color.black, { rank: 7, file: 6 })
+        const blackBishop1 = new Bishop(Color.black, { rank: 7, file: 2 })
+        const blackBishop2 = new Bishop(Color.black, { rank: 7, file: 5 })
+        const blackQueen =   new Queen(Color.black,  { rank: 7, file: 3 })
+        const blackKing =    new King(Color.black,   { rank: 7, file: 4 })
+        const blackPawn1 =   new Pawn(Color.black,   { rank: 6, file: 0 })
+        const blackPawn2 =   new Pawn(Color.black,   { rank: 6, file: 1 })
+        const blackPawn3 =   new Pawn(Color.black,   { rank: 6, file: 2 })
+        const blackPawn4 =   new Pawn(Color.black,   { rank: 6, file: 3 })
+        const blackPawn5 =   new Pawn(Color.black,   { rank: 6, file: 4 })
+        const blackPawn6 =   new Pawn(Color.black,   { rank: 6, file: 5 })
+        const blackPawn7 =   new Pawn(Color.black,   { rank: 6, file: 6 })
+        const blackPawn8 =   new Pawn(Color.black,   { rank: 6, file: 7 })
+
+        // representation of all 64 squares
         this.board = [
             [
-                new Rook(Color.white,   { rank: 0, file: 0 }),
-                new Knight(Color.white, { rank: 0, file: 1 }),
-                new Bishop(Color.white, { rank: 0, file: 2 }),
-                new Queen(Color.white,  { rank: 0, file: 3 }),
-                new King(Color.white,   { rank: 0, file: 4 }),
-                new Bishop(Color.white, { rank: 0, file: 5 }),
-                new Knight(Color.white, { rank: 0, file: 6 }),
-                new Rook(Color.white,   { rank: 0, file: 7 }),
+                whiteRook1,
+                whiteKnight1,
+                whiteBishop1,
+                whiteQueen,
+                whiteKing,
+                whiteBishop2,
+                whiteKnight2,
+                whiteRook2,
             ],
             [
-                new Pawn(Color.white, { rank: 1, file: 0 }),
-                new Pawn(Color.white, { rank: 1, file: 1 }),
-                new Pawn(Color.white, { rank: 1, file: 2 }),
-                new Pawn(Color.white, { rank: 1, file: 3 }),
-                new Pawn(Color.white, { rank: 1, file: 4 }),
-                new Pawn(Color.white, { rank: 1, file: 5 }),
-                new Pawn(Color.white, { rank: 1, file: 6 }),
-                new Pawn(Color.white, { rank: 1, file: 7 }),
+                whitePawn1,
+                whitePawn2,
+                whitePawn3,
+                whitePawn4,
+                whitePawn5,
+                whitePawn6,
+                whitePawn7,
+                whitePawn8
             ],
             [0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
             [
-                new Pawn(Color.black, { rank: 6, file: 0 }),
-                new Pawn(Color.black, { rank: 6, file: 1 }),
-                new Pawn(Color.black, { rank: 6, file: 2 }),
-                new Pawn(Color.black, { rank: 6, file: 3 }),
-                new Pawn(Color.black, { rank: 6, file: 4 }),
-                new Pawn(Color.black, { rank: 6, file: 5 }),
-                new Pawn(Color.black, { rank: 6, file: 6 }),
-                new Pawn(Color.black, { rank: 6, file: 7 }),
+                blackPawn1,
+                blackPawn2,
+                blackPawn3,
+                blackPawn4,
+                blackPawn5,
+                blackPawn6,
+                blackPawn7,
+                blackPawn8
             ],
             [
-                new Rook(Color.black,   { rank: 7, file: 0 }),
-                new Knight(Color.black, { rank: 7, file: 1 }),
-                new Bishop(Color.black, { rank: 7, file: 2 }),
-                new Queen(Color.black,  { rank: 7, file: 3 }),
-                new King(Color.black,   { rank: 7, file: 4 }),
-                new Bishop(Color.black, { rank: 7, file: 5 }),
-                new Knight(Color.black, { rank: 7, file: 6 }),
-                new Rook(Color.black,   { rank: 7, file: 7 }),
+                blackRook1,
+                blackKnight1,
+                blackBishop1,
+                blackQueen,
+                blackKing,
+                blackBishop2,
+                blackKnight2,
+                blackRook2,
             ],
+        ]
+
+        // representation of just the pieces for fast lookups
+        this.pieces = [
+            whiteRook1, whiteKnight1, whiteBishop1, whiteQueen, whiteKing, whiteBishop2, whiteKnight2, whiteRook2,
+            whitePawn1, whitePawn2, whitePawn3, whitePawn4, whitePawn5, whitePawn6, whitePawn7, whitePawn8,
+            blackRook1, blackKnight1, blackBishop1, blackQueen, blackKing, blackBishop2, blackKnight2, blackRook2,
+            blackPawn1, blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7, blackPawn8,
         ]
     }
 
