@@ -1,3 +1,22 @@
+const BOARD_WIDTH = 8
+
+/**
+ * 
+ * @param {*} square object that contains rank & file as array indices ex: { rank: 0, file: 5 }
+ * @returns true if the given square is a square on the board
+ * 
+ * example invocation:
+ * isInBounds({ rank: 1, file: 4}) => true
+ */
+const isInBounds = square => {
+    return (
+        square.rank >= 0 &&
+        square.rank < BOARD_WIDTH &&
+        square.file >= 0 &&
+        square.file < BOARD_WIDTH
+    )
+}
+
 /**
  * Takes in an old square and new square as array indices and calculates the equivalent UCI move
  * 
@@ -18,5 +37,6 @@ const uciStringFromMove = (oldSquare, newSquare) => {
 }
 
 module.exports = {
+    isInBounds,
     uciStringFromMove,
 }
