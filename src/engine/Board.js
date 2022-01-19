@@ -117,27 +117,20 @@ class Board {
         moves.split(' ').forEach(move => this.parseUciMove(move))
     }
 
-    getLegalMoves() {
-        const black = []
-        const white = []
+    getLegalMoves(color) {
+        const res = []
+        const pieces = color === Color.white ? this.pieces.slice(0, 16) : this.pieces.slice(16, 32)
+        pieces.forEach(piece => res.push(...piece.getLegalMoves(this)))
 
-        for (let rank = 0; rank < 8; rank++) {
-            for (let file = 0; file < 8; file++) {
-                if (!this.pieceOnSquare({ rank, file }))
-                    continue
-                
-                const piece = this.board[rank][file]
-                if (piece.isWhite())
-                    white.push(...piece.getLegalMoves(this))
-                else
-                    black.push(...piece.getLegalMoves(this))
-            }
-        }
-        
-        return {
-            black: black.map(move => uciStringFromMove(move.oldSquare, move.newSquare)),
-            white: white.map(move => uciStringFromMove(move.oldSquare, move.newSquare)),
-        }
+        return res
+            .filter(move => {
+                this.makeTempMove(move)            
+                // keep only moves that do not put our color in check
+                const ret = !this.isInCheck(color)
+                this.undoTempMove()
+                return ret
+            })
+            .map(move => uciStringFromMove(move.oldSquare, move.newSquare))
     }
 
     getSquaresWhiteAttacks() {

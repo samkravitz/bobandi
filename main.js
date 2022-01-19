@@ -4,6 +4,7 @@ const hyperquest = require('hyperquest')
 const ndjson = require('ndjson')
 
 const { Board } = require('./src/engine/Board')
+const { Color } = require('./src/engine/piece')
 
 const headers = {
     Authorization: `Bearer ${process.env.lichessToken}`,
@@ -12,13 +13,12 @@ const headers = {
 
 const gameId = 'oKlwlvjS'
 let board
-let isWhite = true
+let color
 
 const handleData = data => {
     switch (data.type) {
         case 'gameFull':
-            isWhite = data.white.name === 'bobandi'
-            let color = isWhite ? 'white' : 'black'
+            color = data.white.name === 'bobandi' ? Color.white : Color.black
             axios.post(`https://lichess.org/api/bot/game/${gameId}/chat`, {
                 room: 'player',
                 text: `Thanks for the challenge! I love playing the ${color} pieces. Let's get started!`
@@ -31,7 +31,7 @@ const handleData = data => {
         case 'gameState':
             board = new Board()
             board.parseUciMoves(data.moves)
-            const legalMoves = isWhite ? board.getLegalMoves().white : board.getLegalMoves().black
+            const legalMoves = board.getLegalMoves(color)
 
             // no legal moves, so we must resign the game :(
             if (legalMoves.length === 0) {
