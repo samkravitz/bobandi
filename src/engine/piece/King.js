@@ -4,6 +4,7 @@ const { isInBounds } = require('../util')
 class King extends Piece {
     constructor(color, square) {
         super(color, square)
+        this.attackedSquares = []
     }
 
     getLegalMoves(board) {
@@ -51,6 +52,16 @@ class King extends Piece {
             res.push({ oldSquare: { ...this.square }, newSquare: { rank: square.rank, file: square.file }})
         
         return res
+    }
+
+    updateAttackedSquares(board) {
+        if (this.isCaptured) {
+            this.attackedSquares = []
+            return
+        }
+
+        this.attackedSquares = this.getLegalMoves(board)
+            .map(move => ({ ...move.newSquare }))
     }
 
     toString() {

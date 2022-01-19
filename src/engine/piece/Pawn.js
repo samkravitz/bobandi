@@ -1,8 +1,20 @@
+const { isInBounds } = require('../util')
 const { Piece } = require('./Piece')
 
 class Pawn extends Piece {
     constructor(color, square) {
         super(color, square)
+
+        const attackedSquares = []
+        this.attackedSquares = []
+        if (this.isWhite()) {
+            attackedSquares.push({ rank: this.square.rank + 1, file: this.square.file + 1 })
+            attackedSquares.push({ rank: this.square.rank + 1, file: this.square.file - 1 })
+        } else {
+            attackedSquares.push({ rank: this.square.rank - 1, file: this.square.rank + 1 })
+            attackedSquares.push({ rank: this.square.rank - 1, file: this.square.rank + 1 })
+        }
+        this.attackedSquares = attackedSquares.filter(square => isInBounds(square))
     }
 
     isOnHomeRank() {
@@ -33,6 +45,23 @@ class Pawn extends Piece {
                 res.push({ oldSquare: { ...this.square }, newSquare: { rank: this.square.rank + 2 * direction, file: this.square.file }})
         }
         return res
+    }
+
+    updateAttackedSquares(board) {
+        if (this.isCaptured) {
+            this.attackedSquares = []
+            return
+        }
+
+        this.attackedSquares = []
+        if (this.isWhite()) {
+            this.attackedSquares.push({ rank: this.square.rank + 1, file: this.square.file + 1 })
+            this.attackedSquares.push({ rank: this.square.rank + 1, file: this.square.file - 1 })
+        } else {
+            this.attackedSquares.push({ rank: this.square.rank - 1, file: this.square.rank + 1 })
+            this.attackedSquares.push({ rank: this.square.rank - 1, file: this.square.rank + 1 })
+        }
+        this.attackedSquares = this.attackedSquares.filter(square => isInBounds(square))
     }
 
     toString() {

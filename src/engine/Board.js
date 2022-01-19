@@ -138,6 +138,17 @@ class Board {
         }
     }
 
+    getSquaresWhiteAttacks() {
+        const res = []
+        this.pieces.slice(0, 16).forEach(piece => res.push(...piece.attackedSquares))
+        return res
+    }
+
+    getSquaresBlackAttacks() {
+        const res = []
+        this.pieces.slice(16, 32).forEach(piece => res.push(...piece.attackedSquares))
+        return res
+    }
     toString() {
         let res = ''
         for (let rank = 7; rank >= 0; rank--) {
