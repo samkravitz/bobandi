@@ -34,6 +34,10 @@ class Piece {
         throw new Error('Method getLegalMoves must be implemented.')
     }
 
+    move(newSquare) {
+        this.square = { ...newSquare }
+    }
+
     toString() {
         throw new Error('Method toString() must be implemented.')
     }
