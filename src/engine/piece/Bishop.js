@@ -9,6 +9,10 @@ class Bishop extends Piece {
 
     getLegalMoves(board) {
         const res = []
+
+        if (this.isCaptured)
+            return res
+
         const currentSquare = this.square
 
         // send bishop up right

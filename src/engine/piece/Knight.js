@@ -18,6 +18,9 @@ class Knight extends Piece {
     }
 
     getLegalMoves(board) {
+        if (this.isCaptured)
+            return []
+
         return [
             { rank: this.square.rank + 1, file: this.square.file + 2 },
             { rank: this.square.rank + 1, file: this.square.file - 2 },

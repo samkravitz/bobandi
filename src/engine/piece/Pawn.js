@@ -30,6 +30,9 @@ class Pawn extends Piece {
     getLegalMoves(board) {
         const res = []
 
+        if (this.isCaptured)
+            return res
+
         // pawn is at edge of board, cannot push any further
         if ((this.isWhite() && this.square.rank === 7) ||
             (!this.isWhite() && this.square.rank === 0)) {
@@ -58,8 +61,8 @@ class Pawn extends Piece {
             this.attackedSquares.push({ rank: this.square.rank + 1, file: this.square.file + 1 })
             this.attackedSquares.push({ rank: this.square.rank + 1, file: this.square.file - 1 })
         } else {
-            this.attackedSquares.push({ rank: this.square.rank - 1, file: this.square.rank + 1 })
-            this.attackedSquares.push({ rank: this.square.rank - 1, file: this.square.rank + 1 })
+            this.attackedSquares.push({ rank: this.square.rank - 1, file: this.square.file + 1 })
+            this.attackedSquares.push({ rank: this.square.rank - 1, file: this.square.file - 1 })
         }
         this.attackedSquares = this.attackedSquares.filter(square => isInBounds(square))
     }
