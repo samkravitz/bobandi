@@ -36,7 +36,12 @@ const uciStringFromMove = (oldSquare, newSquare) => {
     return res
 }
 
+const squareEquals = (squareA, squareB) => {
+    return (squareA.rank === squareB.rank) && (squareA.file === squareB.file)
+}
+
 module.exports = {
     isInBounds,
     uciStringFromMove,
+    squareEquals,
 }
