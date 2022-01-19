@@ -1,5 +1,5 @@
 const { Bishop, King, Knight, Pawn, Queen, Rook, Color } = require('./piece')
-const { uciStringFromMove } = require ('./util')
+const { uciStringFromMove, squareEquals } = require ('./util')
 
 class Board {
     constructor() {
@@ -150,6 +150,18 @@ class Board {
         const res = []
         this.pieces.slice(16, 32).forEach(piece => res.push(...piece.attackedSquares))
         return res
+    }
+
+    isInCheck(color) {
+        const attackedSquares = color === Color.white ? this.getSquaresBlackAttacks() : this.getSquaresWhiteAttacks()
+        const kingSquare = color === Color.white ? this.pieces[4].square : this.pieces[20].square
+
+        for (const square of attackedSquares) {
+            if (squareEquals(kingSquare, square))
+                return true
+        }
+
+        return false
     }
 
     makeMove(move) {
