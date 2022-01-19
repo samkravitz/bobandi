@@ -92,6 +92,10 @@ class Board {
             blackRook1, blackKnight1, blackBishop1, blackQueen, blackKing, blackBishop2, blackKnight2, blackRook2,
             blackPawn1, blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7, blackPawn8,
         ]
+
+        this.tempMoveWasCapture = false
+        this.tempMoveCapturedPiece = null
+        this.tempMove = {}
     }
 
     pieceOnSquare(square) {
@@ -104,9 +108,7 @@ class Board {
         const newFile = move.charCodeAt(2) - 'a'.charCodeAt()
         const newRank = move.charAt(3) - 1
 
-        this.board[newRank][newFile] = this.board[oldRank][oldFile]
-        this.board[newRank][newFile].square = { rank: newRank, file: newFile }
-        this.board[oldRank][oldFile] = 0
+        this.makeMove({ oldSquare: { file: oldFile, rank: oldRank }, newSquare: { file: newFile, rank: newRank } })
     }
 
     parseUciMoves(moves) {
@@ -149,6 +151,55 @@ class Board {
         this.pieces.slice(16, 32).forEach(piece => res.push(...piece.attackedSquares))
         return res
     }
+
+    makeMove(move) {
+        const oldRank = move.oldSquare.rank
+        const oldFile = move.oldSquare.file
+        const newRank = move.newSquare.rank
+        const newFile = move.newSquare.file
+
+        if (this.pieceOnSquare(move.newSquare)) {
+            const capturedPiece = this.board[newRank][newFile]
+            capturedPiece.move({ rank: 8, file: 8 })
+            capturedPiece.isCaptured = true
+        }
+
+        const piece = this.board[oldRank][oldFile]
+        piece.move({ rank: newRank, file: newFile })
+
+        this.board[newRank][newFile] = piece
+        this.board[oldRank][oldFile] = 0
+
+        this.pieces.forEach(piece => piece.updateAttackedSquares(this))
+    }
+
+    makeTempMove(move) {
+        if (this.pieceOnSquare(move.newSquare)) {
+            const capturedPiece = this.board[move.newSquare.rank][move.newSquare.file]
+            this.tempMoveWasCapture = true
+            this.tempMoveCapturedPiece = capturedPiece
+        }
+
+        this.makeMove(move)
+        this.tempMove = move
+    }
+
+    undoTempMove() {
+        const movedPiece = this.board[this.tempMove.newSquare.rank][this.tempMove.newSquare.file]
+        this.board[this.tempMove.oldSquare.rank][this.tempMove.oldSquare.file] = movedPiece
+        this.board[this.tempMove.newSquare.rank][this.tempMove.newSquare.file] = 0
+        movedPiece.move({ rank: this.tempMove.oldSquare.rank, file: this.tempMove.oldSquare.file })
+
+        if (this.tempMoveWasCapture) {
+            this.board[this.tempMove.newSquare.rank][this.tempMove.newSquare.file] = this.tempMoveCapturedPiece
+            this.tempMoveCapturedPiece.move({ rank: this.tempMove.newSquare.rank, file: this.tempMove.newSquare.file })
+            this.tempMoveCapturedPiece.isCaptured = false
+        }
+
+        this.pieces.forEach(piece => piece.updateAttackedSquares(this))
+        this.tempMoveWasCapture = false
+    }
+
     toString() {
         let res = ''
         for (let rank = 7; rank >= 0; rank--) {
