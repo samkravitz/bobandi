@@ -8,6 +8,7 @@ class Piece {
         this.color = color
         this.square = square
         this.isCaptured = false
+        this.moves = []
     }
 
     isWhite() {
@@ -16,7 +17,7 @@ class Piece {
 
     opponentPieceOnSquare(board, rank, file) {
         const piece = board.board[rank][file]
-        if (piece === 0)
+        if (piece === 0 || piece.isCaptured)
             return false
         
         return this.color !== piece.color
@@ -24,7 +25,7 @@ class Piece {
 
     friendlyPieceOnSquare(board, rank, file) {
         const piece = board.board[rank][file]
-        if (piece === 0)
+        if (piece === 0 || piece.isCaptured)
             return false
         
         return this.color === piece.color
@@ -34,8 +35,13 @@ class Piece {
         throw new Error('Method getLegalMoves must be implemented.')
     }
 
-    move(newSquare) {
+    makeMove(newSquare) {
+        this.moves.push({ oldSquare: {...this.square }, ...newSquare })
         this.square = { ...newSquare }
+    }
+
+    undoLastMove() {
+        this.moves.pop()
     }
 
     toString() {

@@ -93,9 +93,10 @@ class Board {
             blackPawn1, blackPawn2, blackPawn3, blackPawn4, blackPawn5, blackPawn6, blackPawn7, blackPawn8,
         ]
 
-        this.tempMoveWasCapture = false
-        this.tempMoveCapturedPiece = null
-        this.tempMove = {}
+        this.lastMoveWasCapture = false
+        this.lastMoveCapturedPiece = null
+
+        this.moves = []
     }
 
     pieceOnSquare(square) {
@@ -124,10 +125,10 @@ class Board {
 
         return res
             .filter(move => {
-                this.makeTempMove(move)            
+                this.makeMove(move)            
                 // keep only moves that do not put our color in check
                 const ret = !this.isInCheck(color)
-                this.undoTempMove()
+                this.undoLastMove()
                 return ret
             })
             .map(move => uciStringFromMove(move.oldSquare, move.newSquare))
@@ -163,46 +164,42 @@ class Board {
         const newRank = move.newSquare.rank
         const newFile = move.newSquare.file
 
+        let wasCapture
+
         if (this.pieceOnSquare(move.newSquare)) {
             const capturedPiece = this.board[newRank][newFile]
-            capturedPiece.move({ rank: 8, file: 8 })
             capturedPiece.isCaptured = true
+            wasCapture = true
+            this.lastMoveCapturedPiece = capturedPiece
+        } else {
+            wasCapture = false
         }
 
         const piece = this.board[oldRank][oldFile]
-        piece.move({ rank: newRank, file: newFile })
+
+        piece.makeMove({ rank: newRank, file: newFile })
 
         this.board[newRank][newFile] = piece
         this.board[oldRank][oldFile] = 0
 
+        this.moves.push({ ...move, wasCapture })
         this.pieces.forEach(piece => piece.updateAttackedSquares(this))
     }
 
-    makeTempMove(move) {
-        if (this.pieceOnSquare(move.newSquare)) {
-            const capturedPiece = this.board[move.newSquare.rank][move.newSquare.file]
-            this.tempMoveWasCapture = true
-            this.tempMoveCapturedPiece = capturedPiece
-        }
+    undoLastMove() {
+        const lastMove = this.moves.pop()
+        const movedPiece = this.board[lastMove.newSquare.rank][lastMove.newSquare.file]
 
-        this.makeMove(move)
-        this.tempMove = move
-    }
+        movedPiece.undoLastMove()
+        this.board[lastMove.oldSquare.rank][lastMove.oldSquare.file] = movedPiece
+        this.board[lastMove.newSquare.rank][lastMove.newSquare.file] = 0
 
-    undoTempMove() {
-        const movedPiece = this.board[this.tempMove.newSquare.rank][this.tempMove.newSquare.file]
-        this.board[this.tempMove.oldSquare.rank][this.tempMove.oldSquare.file] = movedPiece
-        this.board[this.tempMove.newSquare.rank][this.tempMove.newSquare.file] = 0
-        movedPiece.move({ rank: this.tempMove.oldSquare.rank, file: this.tempMove.oldSquare.file })
-
-        if (this.tempMoveWasCapture) {
-            this.board[this.tempMove.newSquare.rank][this.tempMove.newSquare.file] = this.tempMoveCapturedPiece
-            this.tempMoveCapturedPiece.move({ rank: this.tempMove.newSquare.rank, file: this.tempMove.newSquare.file })
-            this.tempMoveCapturedPiece.isCaptured = false
+        if (lastMove.wasCapture) {
+            this.board[lastMove.newSquare.rank][lastMove.newSquare.file] = this.lastMoveCapturedPiece
+            this.lastMoveCapturedPiece.isCaptured = false
         }
 
         this.pieces.forEach(piece => piece.updateAttackedSquares(this))
-        this.tempMoveWasCapture = false
     }
 
     toString() {
