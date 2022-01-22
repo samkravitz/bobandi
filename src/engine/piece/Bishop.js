@@ -5,6 +5,7 @@ class Bishop extends Piece {
     constructor(color, square) {
         super(color, square)
         this.attackedSquares = []
+        this.value = 3
     }
 
     getLegalMoves(board) {

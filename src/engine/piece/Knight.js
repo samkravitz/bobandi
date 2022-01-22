@@ -15,6 +15,8 @@ class Knight extends Piece {
         } else {
             this.attackedSquares = [[{ rank: 5, file: 5}, { rank: 5, file: 7}]]
         }
+
+        this.value = 3
     }
 
     getLegalMoves(board) {

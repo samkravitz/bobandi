@@ -5,6 +5,7 @@ class King extends Piece {
     constructor(color, square) {
         super(color, square)
         this.attackedSquares = []
+        this.value = 100
     }
 
     getLegalMoves(board, checkForCastle = true) {

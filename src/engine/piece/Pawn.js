@@ -15,6 +15,7 @@ class Pawn extends Piece {
             attackedSquares.push({ rank: this.square.rank - 1, file: this.square.rank + 1 })
         }
         this.attackedSquares = attackedSquares.filter(square => isInBounds(square))
+        this.value = 1
     }
 
     isOnHomeRank() {

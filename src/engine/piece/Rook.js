@@ -5,6 +5,7 @@ class Rook extends Piece {
     constructor(color, square) {
         super(color, square)
         this.attackedSquares = []
+        this.value = 5
     }
 
     getLegalMoves(board) {

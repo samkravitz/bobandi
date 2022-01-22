@@ -6,6 +6,7 @@ class Queen extends Piece {
         super(color, square)
 
         this.attackedSquares = []
+        this.value = 9
     }
 
     getLegalMoves(board) {

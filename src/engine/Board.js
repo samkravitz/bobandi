@@ -336,6 +336,20 @@ class Board {
         this.pieces.forEach(piece => piece.updateAttackedSquares(this))
     }
 
+    evaluatePosition() {
+        let evaluation = 0
+        this.pieces.forEach(piece => {
+            if (piece.isCaptured)
+                return
+
+            if (piece.isWhite())
+                evaluation += piece.value
+            else
+                evaluation -= piece.value
+        })
+        return evaluation
+    }
+
     toString() {
         let res = ''
         for (let rank = 7; rank >= 0; rank--) {
