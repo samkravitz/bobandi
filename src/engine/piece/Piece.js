@@ -41,7 +41,8 @@ class Piece {
     }
 
     undoLastMove() {
-        this.moves.pop()
+        const lastMove = this.moves.pop()
+        this.square = { ...lastMove.oldSquare }
     }
 
     toString() {

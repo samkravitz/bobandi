@@ -176,7 +176,6 @@ class Board {
         }
 
         const piece = this.board[oldRank][oldFile]
-
         piece.makeMove({ rank: newRank, file: newFile })
 
         this.board[newRank][newFile] = piece
