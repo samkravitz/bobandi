@@ -36,7 +36,7 @@ class Piece {
     }
 
     makeMove(newSquare) {
-        this.moves.push({ oldSquare: {...this.square }, ...newSquare })
+        this.moves.push({ oldSquare: {...this.square }, newSquare: { ...newSquare } })
         this.square = { ...newSquare }
     }
 
