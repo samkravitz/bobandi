@@ -47,8 +47,25 @@ const handleData = data => {
                 break
             }
 
-            // pick a random legal move and play it
-            const move = legalMoves[Math.floor(Math.random() * legalMoves.length)]
+            // find the best move to make
+            const consideredMoves = []
+            const evalFunction = color === 'white' ? Math.max : Math.min
+            const evals = legalMoves.map(move => {
+                board.parseUciMove(move)
+                const evaluation = board.evaluatePosition()
+                board.undoLastMove()
+                return evaluation
+            })
+
+            const target = evalFunction(...evals)
+            legalMoves.forEach((move, i) => {
+                if (evals[i] === target)
+                    consideredMoves.push(move)
+            })
+
+            // pick a random move if there are multiple best moves
+            const move = consideredMoves[Math.floor(Math.random() * consideredMoves.length)]
+
             axios.post(`https://lichess.org/api/bot/game/${gameId}/move/${move}`, {}, { headers })
                 .catch(err => {
                     if (err.response?.status === 400) {
