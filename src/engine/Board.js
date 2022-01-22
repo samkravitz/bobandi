@@ -109,7 +109,31 @@ class Board {
         const newFile = move.charCodeAt(2) - 'a'.charCodeAt()
         const newRank = move.charAt(3) - 1
 
-        this.makeMove({ oldSquare: { file: oldFile, rank: oldRank }, newSquare: { file: newFile, rank: newRank } })
+        // check if move is castle
+        let isCastle = false
+
+        const pieceOnOldSquare = this.board[oldRank][oldFile]
+
+        if (pieceOnOldSquare instanceof King) {
+            // white kingside castle
+            if (move === 'e1g1')
+                isCastle = true
+            // white queenside castle
+            else if (move === 'e1c1')
+                isCastle = true
+            // black kingside castle
+            else if (move === 'e7g7')
+                isCastle = true
+            // black queenside castle
+            else if (move === 'e7c7')
+                isCastle === true
+        }
+
+        this.makeMove({
+            oldSquare: { file: oldFile, rank: oldRank },
+            newSquare: { file: newFile, rank: newRank },
+            isCastle,
+        })
     }
 
     parseUciMoves(moves) {
@@ -164,6 +188,68 @@ class Board {
         const newRank = move.newSquare.rank
         const newFile = move.newSquare.file
 
+        if (move.isCastle) {
+            let king
+            let oldSquare
+            // white castling
+            if (newRank === 0) {
+                king = this.pieces[4]
+                oldSquare = { ...king.square }
+
+                // kingside castle
+                if (newFile === 6) {
+                    const rook = this.pieces[7]
+                    king.makeMove({ rank: 0, file: 6 })
+                    rook.makeMove({ rank: 0, file: 5 })
+                    this.board[0][6] = king
+                    this.board[0][5] = rook
+                    this.board[0][7] = 0
+                }
+
+                // queenside castle
+                else {
+                    const rook = this.pieces[0]
+                    king.makeMove({ rank: 0, file: 2 })
+                    rook.makeMove({ rank: 0, file: 3 })
+                    this.board[0][2] = king
+                    this.board[0][3] = rook
+                    this.board[0][0] = 0
+                }
+
+                this.board[0][4] = 0
+            }
+            
+            // black castling
+            else if (newRank === 7) {
+                king = this.pieces[20]
+                oldSquare = { ...king.square }
+                // kingside castle
+                if (newFile === 6) {
+                    const rook = this.pieces[23]
+                    king.makeMove({ rank: 7, file: 6 })
+                    rook.makeMove({ rank: 7, file: 5 })
+                    this.board[7][6] = king
+                    this.board[7][5] = rook
+                    this.board[7][7] = 0
+                }
+
+                // queenside castle
+                else {
+                    const rook = this.pieces[16]
+                    king.makeMove({ rank: 7, file: 2 })
+                    rook.makeMove({ rank: 7, file: 3 })
+                    this.board[7][2] = king
+                    this.board[7][3] = rook
+                    this.board[7][0] = 0
+                }
+
+                this.board[7][4] = 0
+            }
+
+            this.moves.push({ oldSquare: { ...oldSquare }, newSquare: { ...king.square }, isCastle: true })
+            return
+        }
+
         let wasCapture
 
         if (this.pieceOnSquare(move.newSquare)) {
@@ -188,6 +274,55 @@ class Board {
     undoLastMove() {
         const lastMove = this.moves.pop()
         const movedPiece = this.board[lastMove.newSquare.rank][lastMove.newSquare.file]
+
+        // undo castle move
+        if (lastMove.isCastle) {
+            let rook
+
+            // white castled
+            if (movedPiece.isWhite()) {
+                this.board[0][4] = movedPiece
+                // kingside castle
+                if (lastMove.newSquare.file === 6) { 
+                    rook = this.pieces[7]
+                    this.board[0][7] = rook
+                    this.board[0][5] = 0
+                    this.board[0][6] = 0
+                }
+
+                // queenside castle
+                else {
+                    rook = this.pieces[0]
+                    this.board[0][0] = rook
+                    this.board[0][2] = 0
+                    this.board[0][3] = 0
+                }
+            }
+
+            // black castled
+            else {
+                this.board[7][4] = movedPiece
+                // kingside castle
+                if (lastMove.newSquare.file === 6) { 
+                    rook = this.pieces[23]
+                    this.board[7][7] = rook
+                    this.board[7][5] = 0
+                    this.board[7][6] = 0
+                }
+
+                // queenside castle
+                else {
+                    rook = this.pieces[16]
+                    this.board[7][0] = rook
+                    this.board[7][2] = 0
+                    this.board[7][3] = 0
+                }
+            }
+
+            rook.undoLastMove()
+            movedPiece.undoLastMove()
+            return
+        }
 
         movedPiece.undoLastMove()
         this.board[lastMove.oldSquare.rank][lastMove.oldSquare.file] = movedPiece
