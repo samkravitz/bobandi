@@ -40,13 +40,14 @@ class Pawn extends Piece {
         }
 
         const direction = this.isWhite() ? 1 : -1
-        if (!board.pieceOnSquare({ rank: this.square.rank + direction, file: this.square.file }))
+        if (!board.pieceOnSquare({ rank: this.square.rank + direction, file: this.square.file })) {
             res.push({ oldSquare: { ...this.square }, newSquare: { rank: this.square.rank + direction, file: this.square.file }})
-        
-        else if (this.isOnHomeRank()) {
-            if (!board.pieceOnSquare({ rank: this.square.rank + 2 * direction, file: this.square.file }))
+            
+            // pawn is on home rank, so it can move forward 2 squares
+            if (this.isOnHomeRank() && !board.pieceOnSquare({ rank: this.square.rank + 2 * direction, file: this.square.file }))
                 res.push({ oldSquare: { ...this.square }, newSquare: { rank: this.square.rank + 2 * direction, file: this.square.file }})
         }
+        
         return res
     }
 
