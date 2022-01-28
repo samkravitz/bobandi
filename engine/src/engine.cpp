@@ -1,7 +1,10 @@
 #include "engine.h"
 
+#include <functional>
+
 #include "piece.h"
 #include "king.h"
+#include "util.h"
 
 float Engine::evaluate()
 {
@@ -67,28 +70,32 @@ void Engine::parse_uci_move(std::string const &move)
 
 std::tuple<Move, float> Engine::best_move(Color c)
 {
-    std::tuple<Move, float> best_move;
     auto legal_moves = board.get_legal_moves(c);
     auto best_evalutation = c == Color::White ? -1000 : 1000;
+    std::vector<std::tuple<Move, float>> considered_moves;
+
+    const auto ge = [](float a, float b) { return std::greater<float>{}(a, b); };
+    const auto le = [](float a, float b) { return std::less<float>{}(a, b); };
+
+    auto cmp_func = c == Color::White ? +ge : +le;
 
     for (auto const &move : legal_moves)
     {
         board.make_move(move);
         float eval = evaluate();
 
-        if (c == Color::White && eval > best_evalutation)
+        if (eval == best_evalutation)
+            considered_moves.push_back(std::make_tuple(move, eval));
+
+        else if (cmp_func(eval, best_evalutation))
         {
+            considered_moves.clear();
+            considered_moves.push_back(std::make_tuple(move, eval));
             best_evalutation = eval;
-            best_move = std::make_tuple(move, eval);
         }
-        
-        else if (c == Color::Black && eval < best_evalutation)
-        {
-            best_evalutation = eval;
-            best_move = std::make_tuple(move, eval);   
-        }
+
         board.undo_last_move();
     }
 
-    return best_move;
+    return util::get_random_element(considered_moves);
 }
