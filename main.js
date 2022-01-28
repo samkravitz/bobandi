@@ -2,6 +2,7 @@ require('dotenv').config()
 const axios = require('axios')
 const hyperquest = require('hyperquest')
 const ndjson = require('ndjson')
+const { exec } = require('child_process')
 
 const { Board } = require('./src/engine/Board')
 const { Color } = require('./src/engine/piece')
@@ -12,7 +13,6 @@ const headers = {
 }
 
 const gameId = 'oKlwlvjS'
-let board
 let color
 
 const handleData = data => {
@@ -25,48 +25,26 @@ const handleData = data => {
             }, { headers })
                 .catch(err => console.log('error sending chat'))
 
-            board = new Board()
-            board.parseUciMoves(data.state.moves)
             break
         case 'gameState':
-            board = new Board()
-            board.parseUciMoves(data.moves)
-            const legalMoves = board.getLegalMoves(color)
+            const toPlay = data.moves.split(' ').length % 2 === 0 ? Color.white : Color.black
+            // it's not our turn
+            if (color !== toPlay)
+                return
 
-            // no legal moves, so we must resign the game :(
-            if (legalMoves.length === 0) {
-                console.log('we have no moves!')
-                axios.post(`https://lichess.org/api/bot/game/${gameId}/chat`, {
-                    room: 'player',
-                    text: 'I\'m out of moves! Remember I am still a very weak player. Let\'s play again soon!'
-                }, { headers })
-                    .catch(err => console.log('error sending chat'))
+            exec(`./cpp/bobandi ${data.moves}`, (error, stdout, stderr) => {
+                if (error) {
+                    console.log('Error running bobandi: ', error)
+                }
 
-                axios.post(`https://lichess.org/api/bot/game/${gameId}/resign`, {}, { headers })
-                    .catch(err => console.log('error resigning 1'))
-                break
-            }
+                if (stderr) {
+                    console.log('stderr: ', stderr)
+                }
 
-            // find the best move to make
-            const consideredMoves = []
-            const evalFunction = color === 'white' ? Math.max : Math.min
-            const evals = legalMoves.map(move => {
-                board.parseUciMove(move)
-                const evaluation = board.evaluatePosition()
-                board.undoLastMove()
-                return evaluation
-            })
+                console.log(stdout)
+                const move = stdout
 
-            const target = evalFunction(...evals)
-            legalMoves.forEach((move, i) => {
-                if (evals[i] === target)
-                    consideredMoves.push(move)
-            })
-
-            // pick a random move if there are multiple best moves
-            const move = consideredMoves[Math.floor(Math.random() * consideredMoves.length)]
-
-            axios.post(`https://lichess.org/api/bot/game/${gameId}/move/${move}`, {}, { headers })
+                axios.post(`https://lichess.org/api/bot/game/${gameId}/move/${move}`, {}, { headers })
                 .catch(err => {
                     if (err.response?.status === 400) {
                         // this is fine, it's just not our turn
@@ -90,6 +68,7 @@ const handleData = data => {
                         }
                     }
                 })
+            })
 
             break
         case 'chatLine':
