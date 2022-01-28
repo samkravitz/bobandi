@@ -25,24 +25,20 @@ const streamEvents = () => {
     hyperquest(`https://lichess.org/api/stream/event`, { headers })
         .pipe(ndjson.parse())
         .on('data', async data => {
+            console.log(data)
             switch (data.type) {
                 case 'gameStart':
-                    console.log('gameStart', data)
                     streamGame(data.game.id)
                     break;
                 case 'gameFinish':
-                    console.log('gameFinish', data)
                     break;
                 case 'challenge':
-                    console.log('challenge', data)
                     // accept the challenge
                     axios.post(`https://lichess.org/api/challenge/${data.challenge.id}/accept`, {}, { headers })
                     break
                 case 'challengeCanceled':
-                    console.log('challengeCanceled', data)
                     break
                 case 'challengeDeclined':
-                    console.log('challengeDeclined', data)
                     break
             }
         })
@@ -55,9 +51,9 @@ const streamGame = async gameId => {
     hyperquest(`https://lichess.org/api/bot/game/stream/${gameId}`, { headers })
         .pipe(ndjson.parse())
         .on('data', async data => {
+            console.log(data)
             switch (data.type) {
                 case 'gameFull':
-                    console.log(data)
                     color = data.white.name === 'bobandi' ? 'white' : 'black'
                     const text = `Thanks for the challenge! I love playing the ${color} pieces. Let's get started!`
                     sendChatToGame(gameId, text)
@@ -111,7 +107,6 @@ const streamGame = async gameId => {
         
                     break
                 case 'chatLine':
-                    console.log(data)
                     break
             }
         })
