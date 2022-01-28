@@ -24,8 +24,6 @@ public:
 
     void make_move(Move const &);
     void undo_last_move();
-    void parse_uci_moves(std::string);
-    void parse_uci_move(std::string const &);
 
     std::string to_string();
 

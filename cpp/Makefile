@@ -6,6 +6,7 @@ INCLUDE = include
 OBJ = \
 	bishop.o \
 	board.o \
+	engine.o \
 	king.o \
 	knight.o \
 	pawn.o \
