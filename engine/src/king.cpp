@@ -67,29 +67,13 @@ bool King::can_castle_kingside(Board *board)
         return false;
 
     // we can't castle through check
-    board->make_move({ square, { rank(), file() + direction }});
-
-    if (board->is_in_check(color))
+    auto attacked_squares = is_white() ? board->get_squares_attacked(Color::Black) : board->get_squares_attacked(Color::White);
+    Square check1{ rank(), file() + direction }, check2{ rank(), file() + 2 * direction };
+    for (auto const &sq : attacked_squares)
     {
-        board->undo_last_move();
-        return false;
+        if (check1 == sq || check2 == sq)
+            return false;
     }
-
-    board->undo_last_move();
-
-    // now make_move if the final castled position is in check
-    board->make_move({ square , { rank(), file() + 2 * direction }});
-    board->make_move({{ kingside_rook->rank(), kingside_rook->file() }, { kingside_rook->rank(), kingside_rook->file() + 2 * -direction }});
-
-    if (board->is_in_check(color))
-    {
-        board->undo_last_move();
-        board->undo_last_move();
-        return false;
-    }
-
-    board->undo_last_move();
-    board->undo_last_move();
 
     // finally! we have determined that we can castle kingside.
     return true;
@@ -118,29 +102,13 @@ bool King::can_castle_queenside(Board *board)
         return false;
 
     // we can't castle through check
-    board->make_move({ square,{ rank(), file() + direction }});
-
-    if (board->is_in_check(color))
+    auto attacked_squares = is_white() ? board->get_squares_attacked(Color::Black) : board->get_squares_attacked(Color::White);
+    Square check1{ rank(), file() + direction }, check2{ rank(), file() + 2 * direction };
+    for (auto const &sq : attacked_squares)
     {
-        board->undo_last_move();
-        return false;
+        if (check1 == sq || check2 == sq)
+            return false;
     }
-
-    board->undo_last_move();
-
-    // now check if the final castled position is in check
-    board->make_move({ square, { rank(), file() + 2 * direction }});
-    board->make_move({{ queenside_rook->rank(), queenside_rook->file() }, { queenside_rook->rank(), queenside_rook->file() + 3 * -direction }});
-
-    if (board->is_in_check(color))
-    {
-        board->undo_last_move();
-        board->undo_last_move();
-        return false;
-    }
-
-    board->undo_last_move();
-    board->undo_last_move();
 
     // finally! we have determined that we can castle queenside.
     return true;
