@@ -7,7 +7,7 @@
 int main(int argc, char **argv)
 {
     Engine engine;
-    if (argc > 2)
+    if (argc > 1)
     {
         for (int i = 1; i < argc; ++i)
         {
