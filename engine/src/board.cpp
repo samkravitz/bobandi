@@ -139,7 +139,7 @@ bool Board::piece_on_square(Square square)
 
 bool Board::is_in_check(Color c)
 {
-    auto attacked_squares = get_squares_attacked(c);
+    auto attacked_squares = c == Color::White ? get_squares_attacked(Color::Black) : get_squares_attacked(Color::White);
     auto *king = c == Color::White ? pieces[4] : pieces[20];
     auto king_square = Square{ king->rank(), king->file() };
 
