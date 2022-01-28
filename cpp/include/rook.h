@@ -8,6 +8,8 @@ class Rook : public Piece
 public:
     Rook(Color, Square);
 
+    int value() { return 5; }
+
     void update_legal_moves(Board *);
     std::string to_string();
 

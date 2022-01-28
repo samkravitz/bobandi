@@ -37,6 +37,7 @@ public:
     virtual std::string to_string() = 0;
     virtual void update_legal_moves(Board *) = 0;
     virtual void update_attacked_squares();
+    virtual int value() = 0;
 
 protected:
     Color color;

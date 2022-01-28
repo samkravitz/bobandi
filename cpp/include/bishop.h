@@ -10,6 +10,8 @@ class Bishop : public Piece
 public:
     Bishop(Color, Square);
 
+    int value() { return 3; }
+
     void update_legal_moves(Board *);
     std::string to_string();
 

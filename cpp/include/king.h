@@ -10,6 +10,8 @@ class King : public Piece
 public:
     King(Color, Square);
 
+    int value() { return 100; }
+
     void update_legal_moves(Board *);
     void update_attacked_squares();
     std::string to_string();

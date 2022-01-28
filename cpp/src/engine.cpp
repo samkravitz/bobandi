@@ -1,6 +1,24 @@
 #include "engine.h"
 
+#include "piece.h"
 #include "king.h"
+
+float Engine::evaluate()
+{
+    float eval = 0.0f;
+    for (auto *piece : board.pieces)
+    {
+        if (piece->is_captured)
+            continue;
+        
+        if (piece->is_white())
+            eval += piece->value();
+        else
+            eval -= piece->value();
+    }
+
+    return eval;
+}
 
 void Engine::parse_uci_moves(std::string moves)
 {
@@ -45,4 +63,5 @@ void Engine::parse_uci_move(std::string const &move)
         m.flags = MoveFlags::Castle;
 
     board.make_move(m);
+}
 }

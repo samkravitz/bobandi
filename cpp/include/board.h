@@ -26,6 +26,7 @@ public:
     void undo_last_move();
 
     std::string to_string();
+    Color to_play();
 
     static bool is_in_bounds(Square square)
     {
