@@ -54,10 +54,10 @@ void Engine::parse_uci_move(std::string const &move)
         else if (move == "e1c1")
             is_castle = true;
         // black kingside castle
-        else if (move == "e7g7")
+        else if (move == "e8g8")
             is_castle = true;
         // black queenside castle
-        else if (move == "e7c7")
+        else if (move == "e8c8")
             is_castle = true;
     }
 
