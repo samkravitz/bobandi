@@ -358,6 +358,11 @@ void Board::undo_last_move()
 
 }
 
+Color Board::to_play()
+{
+    return moves.size() % 2 == 0 ? Color::White : Color::Black;
+}
+
 std::string Board::to_string()
 {
     std::string res = "";

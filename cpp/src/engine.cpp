@@ -64,4 +64,31 @@ void Engine::parse_uci_move(std::string const &move)
 
     board.make_move(m);
 }
+
+std::tuple<Move, float> Engine::best_move(Color c)
+{
+    std::tuple<Move, float> best_move;
+    auto legal_moves = board.get_legal_moves(c);
+    auto best_evalutation = c == Color::White ? -1000 : 1000;
+
+    for (auto const &move : legal_moves)
+    {
+        board.make_move(move);
+        float eval = evaluate();
+
+        if (c == Color::White && eval > best_evalutation)
+        {
+            best_evalutation = eval;
+            best_move = std::make_tuple(move, eval);
+        }
+        
+        else if (c == Color::Black && eval < best_evalutation)
+        {
+            best_evalutation = eval;
+            best_move = std::make_tuple(move, eval);   
+        }
+        board.undo_last_move();
+    }
+
+    return best_move;
 }
