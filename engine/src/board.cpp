@@ -96,7 +96,7 @@ void Board::reset()
 
 std::vector<Move> Board::get_legal_moves(Color c)
 {
-    std::vector<Move> legal_moves;
+    std::vector<Move> all_moves;
 
     int begin, end;
     
@@ -116,18 +116,19 @@ std::vector<Move> Board::get_legal_moves(Color c)
     {
         auto moves = pieces[i]->get_legal_moves();
         for (auto move : moves)
-            legal_moves.push_back(move);
+            all_moves.push_back(move);
     }
+    
+    std::vector<Move> legal_moves;
 
-
-    std::remove_if(legal_moves.begin(), legal_moves.end(), [this, c](auto const &move)
+    // keep only moves that do not put our color in check
+    for(auto &move : all_moves)
     {
         make_move(move);
-        // keep only moves that do not put our color in check
-        bool ret = is_in_check(c);
+        if (!is_in_check(c))
+            legal_moves.push_back(move);
         undo_last_move();
-        return ret;
-    });
+    }
 
     return legal_moves;
 }
