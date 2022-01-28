@@ -1,2 +1,5 @@
 node_modules/
+engine/bin
+engine/bobandi
 .env
+.vscode/
