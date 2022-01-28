@@ -11,7 +11,7 @@ public:
     int value() { return 1; }
 
     void update_legal_moves(Board *);
-    void update_attacked_squares(Board *);
+    void update_attacked_squares();
     std::string to_string();
 
 private:

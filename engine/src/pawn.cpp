@@ -28,7 +28,7 @@ void Pawn::update_legal_moves(Board *board)
     {
         legal_moves.push_back({ square, { rank() + direction, file() }});
         
-        // pawn is on home rank, so it can move forward 2 squaenpassant_square
+        // pawn is on home rank, so it can move forward 2 squares
         if (on_home_rank() && !board->piece_on_square({ rank() + 2 * direction, file() }))
             legal_moves.push_back({ square, { rank() + 2 * direction, file() }});
     }
@@ -39,7 +39,7 @@ void Pawn::update_legal_moves(Board *board)
     
 }
 
-void Pawn::update_attacked_squares(Board *board)
+void Pawn::update_attacked_squares()
 {
     attacked_squares.clear();
     auto direction = is_white() ? 1 : -1;
