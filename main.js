@@ -4,9 +4,6 @@ const hyperquest = require('hyperquest')
 const ndjson = require('ndjson')
 const { exec } = require('child_process')
 
-const { Board } = require('./src/engine/Board')
-const { Color } = require('./src/engine/piece')
-
 const headers = {
     Authorization: `Bearer ${process.env.lichessToken}`,
     Accept: 'application/x-ndjson',
@@ -32,7 +29,7 @@ const handleData = data => {
             if (color !== toPlay)
                 return
 
-            exec(`./cpp/bobandi ${data.moves}`, (error, stdout, stderr) => {
+            exec(`./engine/bobandi ${data.moves}`, (error, stdout, stderr) => {
                 if (error) {
                     console.log('Error running bobandi: ', error)
                 }
