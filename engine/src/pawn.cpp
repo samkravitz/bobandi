@@ -33,6 +33,14 @@ void Pawn::update_legal_moves(Board *board)
             legal_moves.push_back({ square, { rank() + 2 * direction, file() }});
     }
 
+    Square right_attacking { rank() + direction, file() + 1 }, left_attacking { rank() + direction, file() - 1 };
+
+    if (Board::is_in_bounds(left_attacking) && opponent_piece_on_square(board, left_attacking))
+         legal_moves.push_back({ square, left_attacking });
+    
+    if (Board::is_in_bounds(right_attacking) && opponent_piece_on_square(board, right_attacking))
+         legal_moves.push_back({ square, right_attacking });
+
     auto enpassant_square = get_enpassant_square(board);
     if (enpassant_square.rank >= 0)
        legal_moves.push_back({ square, enpassant_square, MoveFlags::EnPassant });
