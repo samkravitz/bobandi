@@ -1,6 +1,5 @@
 #include "pawn.h"
 
-#include <algorithm>
 #include <cmath>
 
 #include "square.h"
@@ -52,9 +51,11 @@ void Pawn::update_attacked_squares()
 {
     attacked_squares.clear();
     auto direction = is_white() ? 1 : -1;
-    attacked_squares.push_back({ rank() + direction, file() + 1 });
-    attacked_squares.push_back({ rank() + direction, file() - 1 });
-    std::remove_if(attacked_squares.begin(), attacked_squares.end(), [](auto const &sq) { return Board::is_in_bounds(sq); });
+    Square check1{ rank() + direction, file() + 1 }, check2{ rank() + direction, file() - 1 };
+    if (Board::is_in_bounds(check1))
+        attacked_squares.push_back(check1);
+    if (Board::is_in_bounds(check2))
+        attacked_squares.push_back(check2);
 }
 
 Square Pawn::get_enpassant_square(Board *board)
