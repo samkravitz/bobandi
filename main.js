@@ -18,7 +18,7 @@ const sendChatToGame = (gameId, text) => {
 }
 
 const resignGame = gameId => {
-    axios.post(`https://lichess.org/api/bot/game/${gameId}/resign`, {}, { headers })
+    axios.post(`https://lichess.org/api/bot/game/${gameId}/resign`, {}, { headers }).catch(err => {})
 }
 
 const streamEvents = () => {
@@ -34,7 +34,7 @@ const streamEvents = () => {
                     break;
                 case 'challenge':
                     // accept the challenge
-                    axios.post(`https://lichess.org/api/challenge/${data.challenge.id}/accept`, {}, { headers })
+                    axios.post(`https://lichess.org/api/challenge/${data.challenge.id}/accept`, {}, { headers }).catch(err => {})
                     break
                 case 'challengeCanceled':
                     break
@@ -73,6 +73,10 @@ const streamGame = async gameId => {
                         sendChatToGame(gameId, 'Fantastic move!! Let me analyze...')
                         return
                     }
+
+                    // the game is already over, so don't run the engine
+                    if (data.status === 'mate' || data.status === 'draw')
+                        return
         
                     exec(`./engine/bobandi ${data.moves}`, (error, stdout, stderr) => {
                         if (error) {
