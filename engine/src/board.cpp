@@ -274,9 +274,24 @@ void Board::make_move(Move const &move)
     board[new_rank][new_file] = piece;
     board[old_rank][old_file] = nullptr;
 
+    if (move.flags == MoveFlags::Promotion)
+    {
+        auto color = piece->is_white() ? Color::White : Color::Black;
+        int pieces_idx = piece->file();
+
+        // white pawns start at pieces[8] and black pawns at pieces[24]
+        pieces_idx += color == Color::White ? 8 : 24;
+
+        auto *new_queen = new Queen(color, { new_rank, new_file });
+        board[new_rank][new_file] = new_queen;
+        pieces[pieces_idx] = new_queen;
+        last_move_promoted_pawn = piece;
+    }
+
     auto new_move = move;
     if (was_capture)
         new_move.was_capture = true;
+
     moves.push(new_move);
     for (auto *piece : pieces)
         piece->update(this);
@@ -345,6 +360,21 @@ void Board::undo_last_move()
         for (auto *piece : pieces)
             piece->update(this);
         return;
+    }
+
+    // undo promotion
+    if (last_move.flags == MoveFlags::Promotion)
+    {
+        auto *new_queen = moved_piece;
+        auto *promoted_pawn = last_move_promoted_pawn;
+        int pieces_idx = new_queen->file();
+
+        // white pawns start at pieces[8] and black pawns at pieces[24]
+        pieces_idx +=  new_queen->is_white() ? 8 : 24;
+        pieces[pieces_idx] = promoted_pawn;
+        
+        delete new_queen;
+        moved_piece = promoted_pawn;
     }
 
     moved_piece->undo_last_move();

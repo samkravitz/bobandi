@@ -39,5 +39,6 @@ public:
 
 private:
     Piece *last_move_captured_piece = nullptr;
+    Piece *last_move_promoted_pawn = nullptr;
     void reset();
 };

@@ -18,15 +18,16 @@ void Pawn::update_legal_moves(Board *board)
     if (is_captured)
         return;
 
-    // pawn is at edge of board, cannot push any further
-    if ((is_white() && rank() == 7) ||
-        (!is_white() && rank() == 0))
-            return;
-
     auto direction = is_white() ? 1 : -1;
-    if (!board->piece_on_square({ rank() + direction, file() }))
+
+    Square new_square = { rank() + direction, file() };
+    if (!board->piece_on_square(new_square))
     {
-        legal_moves.push_back({ square, { rank() + direction, file() }});
+        Move m { square, new_square };
+        // test for promotion
+        if (new_square.rank == 0 || new_square.rank == 7)
+            m.flags = MoveFlags::Promotion;
+        legal_moves.push_back(m);
         
         // pawn is on home rank, so it can move forward 2 squares
         if (on_home_rank() && !board->piece_on_square({ rank() + 2 * direction, file() }))
