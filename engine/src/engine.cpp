@@ -25,12 +25,22 @@ float Engine::evaluate()
 
 void Engine::parse_uci_moves(std::string moves)
 {
-    while (moves != "")
+    std::string move = "";
+    for (int i = 0; i < moves.length(); ++i)
     {
-        auto move = moves.substr(0, 4);
-        parse_uci_move(move);
-        moves.erase(0, 5);
+        char c = moves.at(i);
+        if (c == ' ')
+        {
+            parse_uci_move(move);
+            move = "";
+        }
+
+        else
+            move += c;
     }
+
+    if (move != "")
+        parse_uci_move(move);    
 }
 
 void Engine::parse_uci_move(std::string const &move)
@@ -64,6 +74,9 @@ void Engine::parse_uci_move(std::string const &move)
     Move m { { old_rank, old_file }, { new_rank, new_file }};
     if (is_castle)
         m.flags = MoveFlags::Castle;
+    
+    if (move.length() > 4)
+        m.flags = MoveFlags::Promotion;
 
     board.make_move(m);
 }
