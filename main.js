@@ -33,8 +33,13 @@ const streamEvents = () => {
                 case 'gameFinish':
                     break;
                 case 'challenge':
-                    // accept the challenge
-                    axios.post(`https://lichess.org/api/challenge/${data.challenge.id}/accept`, {}, { headers }).catch(err => {})
+                    let choice = 'accept'
+                    // decline rated challenges of variants
+                    if (data.challenge.rated && data.challenge.variant.key !== 'standard')
+                        choice = 'decline'
+
+                    // accept all other challenges
+                    axios.post(`https://lichess.org/api/challenge/${data.challenge.id}/${choice}`, {}, { headers }).catch(err => {})
                     break
                 case 'challengeCanceled':
                     break
