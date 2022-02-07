@@ -34,8 +34,8 @@ const streamEvents = () => {
                     break;
                 case 'challenge':
                     let choice = 'accept'
-                    // decline rated challenges of variants
-                    if (data.challenge.rated && data.challenge.variant.key !== 'standard')
+                    // decline rated challenges
+                    if (data.challenge.rated)
                         choice = 'decline'
 
                     // accept all other challenges
