@@ -1,5 +1,4 @@
 node_modules/
-engine/bin
-engine/bobandi
+excalibur/
 .env
 .vscode/
