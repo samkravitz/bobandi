@@ -83,7 +83,7 @@ const streamGame = async gameId => {
                     if (data.status === 'mate' || data.status === 'draw')
                         return
         
-                    exec(`./engine/bobandi ${data.moves}`, (error, stdout, stderr) => {
+                    exec(`./excalibur/excalibur ${data.moves}`, (error, stdout, stderr) => {
                         if (error) {
                             console.log('Error running bobandi: ', error)
                             sendChatToGame(gameId, 'Sorry, but there was an error when trying to run my engine. This can happen as I am still under early development. Let\'s play again soon!')
