@@ -96,8 +96,8 @@ const streamGame = async gameId => {
                         }
         
                         const move = stdout
-        
-                        axios.post(`https://lichess.org/api/bot/game/${gameId}/move/${move}`, {}, { headers })
+						setTimeout(() => {
+							axios.post(`https://lichess.org/api/bot/game/${gameId}/move/${move}`, {}, { headers })
                             .catch(err => {
                                 if (err.response?.status === 400) {
                                     // this is fine, it's just not our turn
@@ -112,6 +112,7 @@ const streamGame = async gameId => {
                                     }
                                 }
                             })
+						}, 2000)
                     })
         
                     break
