@@ -52,6 +52,7 @@ const streamEvents = () => {
 const streamGame = async gameId => {
     
     let color
+	let gameTime
 
     hyperquest(`https://lichess.org/api/bot/game/stream/${gameId}`, { headers })
         .pipe(ndjson.parse())
@@ -60,6 +61,7 @@ const streamGame = async gameId => {
             switch (data.type) {
                 case 'gameFull':
                     color = data.white.name === 'bobandi' ? 'white' : 'black'
+					gameTime = data.clock.initial
                     const text = `Thanks for the challenge! I love playing the ${color} pieces. Let's get started!`
                     sendChatToGame(gameId, text)
 
@@ -82,8 +84,10 @@ const streamGame = async gameId => {
                     // the game is already over, so don't run the engine
                     if (data.status === 'mate' || data.status === 'draw')
                         return
+					
+					const time = color === 'white' ? data.wtime : data.btime
         
-                    exec(`./excalibur/excalibur ${data.moves}`, (error, stdout, stderr) => {
+                    exec(`./excalibur/excalibur -g ${gameTime} -t ${time} ${data.moves}`, (error, stdout, stderr) => {
                         if (error) {
                             console.log('Error running bobandi: ', error)
                             sendChatToGame(gameId, 'Sorry, but there was an error when trying to run my engine. This can happen as I am still under early development. Let\'s play again soon!')
@@ -96,23 +100,22 @@ const streamGame = async gameId => {
                         }
         
                         const move = stdout
-						setTimeout(() => {
-							axios.post(`https://lichess.org/api/bot/game/${gameId}/move/${move}`, {}, { headers })
-                            .catch(err => {
-                                if (err.response?.status === 400) {
-                                    // this is fine, it's just not our turn
-                                    if (err.response.data.error === 'Not your turn, or game already over') {
-                                        console.log('its fine, its just not our turn!')
-                                    }                        
-                                    // Our move is not legal, so we must resign the game :(
-                                    else {
-                                        console.log('Our move was illegal!', err.response.data.error)
-                                        sendChatToGame(gameId, 'I\'m out of moves! Remember I am still a very weak player. Let\'s play again soon!')
-                                        resignGame(gameId)
-                                    }
-                                }
-                            })
-						}, 2000)
+						axios.post(`https://lichess.org/api/bot/game/${gameId}/move/${move}`, {}, { headers })
+						.catch(err => {
+							if (err.response?.status === 400) {
+								// this is fine, it's just not our turn
+								if (err.response.data.error === 'Not your turn, or game already over') {
+									console.log('its fine, its just not our turn!')
+								}                        
+								// Our move is not legal, so we must resign the game :(
+								else {
+									console.log('Our move was illegal!', err.response.data.error)
+									sendChatToGame(gameId, 'I\'m out of moves! Remember I am still a very weak player. Let\'s play again soon!')
+									resignGame(gameId)
+								}
+							}
+						})
+						
                     })
         
                     break
