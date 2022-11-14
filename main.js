@@ -86,8 +86,10 @@ const streamGame = async gameId => {
                         return
 					
 					const time = color === 'white' ? data.wtime : data.btime
+					command = `./excalibur/excalibur -g ${gameTime} -t ${time} ${data.moves}`
+					console.log('issuing command: ', command)
         
-                    exec(`./excalibur/excalibur -g ${gameTime} -t ${time} ${data.moves}`, (error, stdout, stderr) => {
+                    exec(command, (error, stdout, stderr) => {
                         if (error) {
                             console.log('Error running bobandi: ', error)
                             sendChatToGame(gameId, 'Sorry, but there was an error when trying to run my engine. This can happen as I am still under early development. Let\'s play again soon!')
